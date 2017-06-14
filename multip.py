@@ -1,4 +1,4 @@
-from multiprocessing import Process, Lock
+from multiprocessing import Process, Lock, Queue
 import os
 
 def info(title):
