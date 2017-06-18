@@ -1,51 +1,74 @@
 import requests
 from multiprocessing import Process, Queue
 import os, time
-from numpy.random import exponential
+from numpy.random import exponential, choice
+
 
 SERVICE_URL = 'http://localhost:5000'
 
 
-class State:
-    THINKING = 0
-    WAITING = 1
-
-
 class WLGenerator:
     # http://docs.python-requests.org/en/latest/api/#requests.Response
-    def __init__(self, n, t):
-        self.users = [User(t) for _ in range(n)]
-        print(self.get_video_list())
-        self.request_convertion(1)
+    def __init__(self, host, n_users, think_time):
+        self.host = host
+        self.n_users = n_users
+        self.think_time = think_time
 
     def run_wg(self):
-        return None
+        ps = []
+        for _ in range(self.n_users):
+            u = User(self.host, self.think_time)
+            u.start()
+            ps.append(user)
 
-    def get_video_list(self):
-        r = requests.get(SERVICE_URL + u'/api/v1/movies')
-        return r.status_code
-
-    def request_convertion(self, video_id):
-        r = requests.get(SERVICE_URL + u'/api/v1/movies/' + str(video_id))
-        print(r.url)
+        for p in ps:
+            p.join()
 
 
-class User:
-    def __init__(self, think_time_constant):
-        self.think_time_constant = think_time_constant
-        self.think_time = exponential(1.0/self.think_time_constant)
-        self.STATE = State.THINKING
+class User(Process):
+    def __init__(self, host, think_time):
+        super(Process, self).__init__()
+        self.host = host
+        self.think_time = think_time
 
-    def get_new_think_time(self):
-        if self.STATE == State.THINKING:
-            self.think_time = exponential(1.0/self.think_time_constant)
+    def run(self):
+        while True:
+            try:
+                self.send_request_to_server()
+            except requests.exceptions.HTTPError as e:
+                self.log = ""
+                # Store http errors and try again
+                #self.log.error(e)
 
-        return self.think_time
+    def send_request_to_server(self):
+        time.sleep(exponential(1.0/self.think_time))
 
-    def set_state(self, state):
-        self.STATE = state
+        #Send request for available movies
+        r = requests.get(self.host + 'api/v1/movies/', timeout = 5)
+        r.raise_for_status()
+
+        movie_to_encode = choice(r.json()['items'])
+
+        r = requests.get(self.host + 'api/v1/movies/' + movie_to_encode, timeout = 5)
+        self.log.info("Requested {} for conversion, response {}".format(my_video, r.status_code))
+        r.raise_for_status()
+
+        job_uri = r.headers['location']
+
+        #Poll for status
+        while True:
+            time.sleep(0.1)
+            #self.log.debug("Requesting status after {} seconds of wait".format(self.poll_wait))
+            r = requests.get(job_uri, timeout = 5)
+            r.raise_for_status()
+            status_msg = r.json()
+
+            if status_msg['resolution'] != "null":
+                #self.log.info("Requested finished with resolution {}".format(status_msg['resolution']))
+                break
+
 
 
 if __name__ == '__main__':
-    WG = WLGenerator(10, 1)
+    WG = WLGenerator(SERVICE_URL, 10, 1)
     WG.run_wg()
