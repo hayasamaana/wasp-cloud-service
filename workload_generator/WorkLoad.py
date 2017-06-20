@@ -1,7 +1,7 @@
 import requests
 from multiprocessing import Process, Queue
 import os, time
-from numpy.random import exponential, choice, seed
+from random import choice, expovariate
 import logging
 import shutil
 
@@ -19,36 +19,36 @@ class WLGenerator:
     def run_wg(self):
         ps = []
         for pid in range(self.n_users):
-            u = User(self.host, self.think_time, pid)
-            u.start()
-            ps.append(u)
+            p = Process(target=User, args=(self.host, self.think_time,))
+            p.start()
+            ps.append(p)
 
         for p in ps:
             p.join()
 
 
-class User(Process):
+class User:
     # http://docs.python-requests.org/en/latest/api/#requests.Response
     # http://docs.python-guide.org/en/latest/writing/logging/
     # https://docs.python.org/3.6/library/logging.html
     # https://stackoverflow.com/questions/303200/how-do-i-remove-delete-a-folder-that-is-not-empty-with-python#303225
 
-    def __init__(self, host, think_time, pid, timeout = 2):
-        super().__init__()
-        self._set_up_logger(pid)
+    def __init__(self, host, think_time, timeout = 2):
+        self.pid = os.getpid()
+        self._set_up_logger(self.pid)
         self.host = host
         self.think_time = think_time
         self.timeout = timeout
-        self.log.info('{}'.format(os.getpid()))
-        seed()
+        self.log.info('{}'.format(self.pid))
+        self.run()
 
     def _set_up_logger(self, pid):
-        self.log = logging.getLogger("Process{}".format(pid))
+        self.log = logging.getLogger("Process{}".format(self.pid))
 
         formatter = logging.Formatter(
         '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
 
-        file_handle = logging.FileHandler('logs/process{}.log'.format(pid))
+        file_handle = logging.FileHandler('logs/process{}.log'.format(self.pid))
         handler = logging.StreamHandler()
 
         handler.setFormatter(formatter)
@@ -61,7 +61,7 @@ class User(Process):
     def run(self):
         while True:
             try:
-                t = exponential(1.0/self.think_time)
+                t = expovariate(1.0/self.think_time)
                 self.log.info('sleeping for {} seconds'.format(t))
                 time.sleep(t)
 
