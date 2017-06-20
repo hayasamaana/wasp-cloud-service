@@ -11,15 +11,17 @@ SERVICE_URL = 'http://localhost:5000'
 
 class WLGenerator:
 
-    def __init__(self, host, n_users, think_time):
+    def __init__(self, host, n_users, think_time, poll_time = 1., timeout = 2.):
         self.host = host
         self.n_users = n_users
         self.think_time = think_time
+        self.poll_time = poll_time
+        self.timeout = timeout
 
     def run_wg(self):
         ps = []
-        for pid in range(self.n_users):
-            p = Process(target=User, args=(self.host, self.think_time,))
+        for _ in range(self.n_users):
+            p = Process(target=User, args=(self.host, self.think_time, self.poll_time, self.timeout))
             p.start()
             ps.append(p)
 
@@ -33,11 +35,12 @@ class User:
     # https://docs.python.org/3.6/library/logging.html
     # https://stackoverflow.com/questions/303200/how-do-i-remove-delete-a-folder-that-is-not-empty-with-python#303225
 
-    def __init__(self, host, think_time, timeout = 2):
+    def __init__(self, host, think_time, poll_time = 1., timeout = 2.):
         self.pid = os.getpid()
         self._set_up_logger(self.pid)
         self.host = host
         self.think_time = think_time
+        self.poll_time = poll_time
         self.timeout = timeout
         self.log.info('{}'.format(self.pid))
         self.run()
@@ -71,7 +74,6 @@ class User:
                 self.log.error(e)
 
     def send_request_to_server(self):
-
         #Send request for available movies
         r = requests.get(self.host + '/api/v1/movies', timeout = self.timeout)
         r.raise_for_status()
@@ -86,7 +88,7 @@ class User:
 
         #Poll job status
         while True:
-            time.sleep(0.5)
+            time.sleep(self.poll_time)
             self.log.debug('Polling job status')
             r = requests.get(job_uri, timeout = self.timeout)
             r.raise_for_status()
@@ -103,7 +105,6 @@ class User:
             movie_uris.append(movie['uri'])
 
         return choice(movie_uris)
-
 
 
 if __name__ == '__main__':
