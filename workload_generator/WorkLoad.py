@@ -1,12 +1,19 @@
 import requests
 from multiprocessing import Process, Queue
-import os, time
+import os, time, signal, sys
 from random import choice, expovariate
 import logging
 import shutil
 
 
 SERVICE_URL = 'http://localhost:5000'
+
+
+def signal_handler(signal, frame):
+        print('Process {} You pressed Ctrl+C! Quitting simulation.'.format(os.getpid()))
+        sys.exit(0)
+
+signal.signal(signal.SIGINT, signal_handler)
 
 
 class WLGenerator:
