@@ -1,11 +1,14 @@
 #!/usr/bin/env python3
 from flask import Flask, jsonify, abort
-from flask import make_response, request, url_for
+from flask import make_response, request, url_for, render_template
+from werkzeug import secure_filename
 import uuid
 from datetime import datetime
 from copy import copy
 
 app = Flask(__name__)
+
+ALLOWED_EXTENSIONS = set(['mkv'])
 
 movies = [{'title':'movie1'},
             {'title':'movie2'},
@@ -17,6 +20,9 @@ jobs_id = {}
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1] in ALLOWED_EXTENSIONS
 
 def make_public_movie(movie):
     new_movie = copy(movie)
@@ -26,9 +32,18 @@ def make_public_movie(movie):
     return new_movie
 
 
-@app.route('/api/v1/movies', methods=['GET'])
+@app.route('/api/v1/movies', methods=['POST', 'PUT', 'GET'])
 def get_movies():
-    return jsonify([make_public_movie(movie) for movie in movies])
+    if request.method == ['POST', 'PUT']: # or request.method == 'PUT':
+        f = request.files['file']
+
+        if f and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            f.save(filename)  # File appears in the directory, should be put on SWIFT
+            return jsonify({"message": "file uploaded!"})
+        return redirect(url_for('get_movies'))
+    #return jsonify([make_public_movie(movie) for movie in movies])
+    return render_template('upload.html')
 
 
 @app.route('/api/v1/movies/<movie>', methods=['GET'])
