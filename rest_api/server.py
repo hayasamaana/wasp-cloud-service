@@ -42,8 +42,8 @@ def get_movies():
             f.save(filename)  # File appears in the directory, should be put on SWIFT
             return jsonify({"message": "file uploaded!"})
         return redirect(url_for('get_movies'))
-    #return jsonify([make_public_movie(movie) for movie in movies])
-    return render_template('upload.html')
+    return jsonify([make_public_movie(movie) for movie in movies])
+    #return render_template('upload.html')
 
 
 @app.route('/api/v1/movies/<movie>', methods=['GET'])
