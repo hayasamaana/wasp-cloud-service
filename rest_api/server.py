@@ -1,4 +1,4 @@
-#!flask/bin/python
+#!/usr/bin/env python3
 from flask import Flask, jsonify, abort
 from flask import make_response, request, url_for
 import uuid

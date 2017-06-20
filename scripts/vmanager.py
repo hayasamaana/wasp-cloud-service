@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from __future__ import print_function
 from keystoneauth1.identity import v3
 from keystoneauth1 import session

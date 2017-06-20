@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import requests
 from multiprocessing import Process, Queue
 import os, time, signal, sys
