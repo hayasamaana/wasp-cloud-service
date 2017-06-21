@@ -12,10 +12,12 @@ sudo pip install Flask
 mkdir /var/www
 cd /var/www
 
-#echo "Cloning repo of the WASPY microservice"
-#git clone https://github.com/muyiibidun/WASP.git
+#echo "Cloning repo .."
+git clone https://github.com/chrinels/wasp-cloud-service.git cloud_service
 
+export LC_ALL=en_US.UTF-8
+export LANG=en_US.UTF-8
 
-#run you code HERE!
-#cd WASP/waspy
-#python start.py
+# run code HERE!
+cd cloud_service/rest_api
+python3 server.py
