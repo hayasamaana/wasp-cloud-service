@@ -1,2 +1,4 @@
 # ignore credentials
 config.properties
+*.pem
+LTH-1-openrc.sh
