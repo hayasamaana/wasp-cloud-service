@@ -2,11 +2,13 @@
 
 # Install some packages
 sudo apt-get -y update
-sudo apt-get install -y python-dev
-sudo apt-get install -y python-pip
+sudo apt-get install -y python3 python3-pip
+
+sudo pip3 install --upgrade pip
 
 # install python Flask web framework
-sudo pip install Flask
+sudo pip3 install Flask
+sudo pip3 install python-swiftclient python-keystoneclient
 
 # prepare install directory for application
 mkdir /var/www
