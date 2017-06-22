@@ -1,20 +1,30 @@
 #!/usr/bin/env python3
+
+#https://stackoverflow.com/questions/9383014/cant-import-my-own-modules-in-python
+import sys
+sys.path.append("../")
+
 from flask import Flask, jsonify, abort
 from flask import make_response, request, url_for, render_template
 from werkzeug import secure_filename
 import uuid
 from datetime import datetime
 from copy import copy
+from swiftwrapper.wrapper import SwiftWrapper, ServiceDefaults
 
 app = Flask(__name__)
 
 ALLOWED_EXTENSIONS = set(['mkv'])
 
+'''
 movies = [{'title':'movie1'},
             {'title':'movie2'},
             {'title':'movie3'},
             {'title':'movie4'}]
+'''
 jobs_id = {}
+
+swift_cl = SwiftWrapper()
 
 @app.errorhandler(404)
 def not_found(error):
@@ -42,6 +52,8 @@ def get_movies():
             f.save(filename)  # File appears in the directory, should be put on SWIFT
             return jsonify({"message": "file uploaded!"})
         return redirect(url_for('get_movies'))
+    movies = swift_cl.list_container(container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER)
+    print(movies)
     return jsonify([make_public_movie(movie) for movie in movies])
     #return render_template('upload.html')
 
@@ -50,6 +62,7 @@ def get_movies():
 def get_encoded_movie(movie):
 
     movie_exist = False
+    movies = swift_cl.list_container(container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER)
     for entry in movies:
         if entry['title'] == movie:
             movie_exist = True
