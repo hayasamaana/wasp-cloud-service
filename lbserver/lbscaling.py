@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-from flask import Flask
 import pika, requests
 #from optparse import OptionParser
 #import ConfigParser
@@ -13,21 +11,23 @@ url = 'http://localhost/upstream_conf'
 
 
 def callback(ch, method, properties, body):
-    flag = body[0] #flag=0, invoke removeip, flag=1, invoke addip
-    address = body[1]
-    if flag == 0:
+    flag = body[0] #body is the message received, which is in the format of '1xxx.xxx.xxx.xxx'
+    address = body[1:] #first digit in the body is flag bit, flag=0, invoke removeip, flag=1, invoke addip
+    print("%s" % address)
+    if flag == '0':
         removeip(address)
-    if flag == 1:
+    if flag == '1':
         addip(address)
 
-    
+
 def addip(address):
     payload = {'upstream':'webserver','add':'','server':address}
     r = requests.get(url,params=payload)
     idnum = r.content[len(r.content)-2] # get the id# for the added ip
     newipid = {address:idnum}
     iptab.update(newipid)
-    
+    print("%s" % iptab)
+
 def removeip(address):
     idnum = iptab.get(address) #get the id# for the removed ip
     payload = {'upstream':'webserver','remove':'','id':idnum}
@@ -36,33 +36,15 @@ def removeip(address):
 
 
 
+
 if __name__ == "__main__":
-	#parser = OptionParser()
-	#parser.add_option('-c', '--credential', dest='credentialFile',
-    #                 help='Path to CREDENTIAL file', metavar='CREDENTIALFILE')
-	#(options, args) = parser.parse_args()
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
+    channel = connection.channel()
+    channel.queue_declare(queue='lb_queue')
+    channel.basic_consume(callback,queue='lb_queue',no_ack=True)
 
-	#if options.credentialFile:
-	#	config = ConfigParser.RawConfigParser()
-	#	config.read(options.credentialFile)
-	#	connection = {}
-	#	connection["server"] = config.get('rabbit', 'server')
-	#	connection["port"] = int(config.get('rabbit', 'port'))
-	#	connection["queue"] = config.get('rabbit', 'queue')
-	#	connection["username"]=config.get('rabbit', 'username')
-	#	connection["password"]=config.get('rabbit', 'password')
-        connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
-        channel = connection.channel()
-        channel.queue_declare(queue='lb_queue')
-		channel.basic_consume(callback,queue='lb_queue',no_ack=True)
-
-        print(' [*] Waiting for messages. To exit press CTRL+C')
-        channel.start_consuming()
-
-		
-	else:
-        #e.g. python frontend.py -c credentials.txt
-		print("Syntax: 'python lbscaling.py -h' | '--help' for help")
+    print(' [*] Waiting for messages. To exit press CTRL+C')
+    channel.start_consuming()
 
 
 
