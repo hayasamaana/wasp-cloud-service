@@ -1,8 +1,10 @@
+#! /usr/bin/env pyhon3
+
+import sys
+from os import environ
 from swiftclient.service import SwiftService, SwiftError, SwiftUploadObject
 from swiftclient.client import ClientException
 from swiftclient.utils import generate_temp_url
-from ConfigParser import SafeConfigParser
-import sys
 
 
 class ServiceDefaults:
@@ -15,7 +17,10 @@ class SwiftWrapper:
 
     def __init__(self):
         swift_auth = self.read_conf()
-        self.swift = SwiftService(swift_auth)
+        try:
+            self.swift = SwiftService(swift_auth)
+        except ClientException as e:
+            print(e)
 
 
     def read_conf(self):
@@ -26,17 +31,14 @@ class SwiftWrapper:
             print('Can not find credentials file')
             sys.exit()
 
-        username=parser.get("auth","username")
-        password=parser.get("auth","password")
-        project_name=parser.get("auth","project_name")
-        project_domain=parser.get("auth","project_domain_name")
-        auth_url=parser.get("auth","auth_url")
-
-        swift_auth = {"username":username,
-                            "password":password,
-                            "project_name":project_name,
-                            "project_domain_name":project_domain,
-                            "auth_url":auth_url}
+        swift_auth = {
+            "auth_version": environ.get('ST_AUTH_VERSION'),  # Should be '3'
+            "os_username": environ.get('OS_USERNAME'),
+            "os_password": environ.get('OS_PASSWORD'),
+            "os_project_name": environ.get('OS_PROJECT_NAME'),
+            "os_project_domain_name": environ.get('OS_PROJECT_DOMAIN_NAME'),
+            "os_auth_url": environ.get('OS_AUTH_URL')
+            }
 
         return swift_auth
 
@@ -49,9 +51,11 @@ class SwiftWrapper:
                 if list_res['success']:
                     for obj in list_res['listing']:
                         container_contents.append(obj['name'])
+                else:
+                    raise list_res['error']
 
         except (ClientException, SwiftError) as e:
-            print(e)
+            print('Exception in "list_container":\t{}'.format(e))
             pass
 
         return container_contents
@@ -98,4 +102,4 @@ class SwiftWrapper:
 
 if __name__ == '__main__':
     sw = SwiftWrapper()
-    print(sw.list_container(container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER))
+    print(sw.list_container())
