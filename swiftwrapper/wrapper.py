@@ -24,13 +24,7 @@ class SwiftWrapper:
 
 
     def read_conf(self):
-        parser = SafeConfigParser()
-        try:
-            parser.read('../scripts/config.properties')
-        except IOError:
-            print('Can not find credentials file')
-            sys.exit()
-
+        # https://docs.openstack.org/developer/python-swiftclient/service-api.html
         swift_auth = {
             "auth_version": environ.get('ST_AUTH_VERSION'),  # Should be '3'
             "os_username": environ.get('OS_USERNAME'),
@@ -50,7 +44,7 @@ class SwiftWrapper:
             for list_res in list_generator:
                 if list_res['success']:
                     for obj in list_res['listing']:
-                        container_contents.append(obj['name'])
+                        container_contents.append({'title':obj['name']})
                 else:
                     raise list_res['error']
 
