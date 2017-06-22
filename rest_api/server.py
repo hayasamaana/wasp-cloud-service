@@ -53,9 +53,7 @@ def get_movies():
             return jsonify({"message": "file uploaded!"})
         return redirect(url_for('get_movies'))
     movies = swift_cl.list_container(container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER)
-    print(movies)
     return jsonify([make_public_movie(movie) for movie in movies])
-    #return render_template('upload.html')
 
 
 @app.route('/api/v1/movies/<movie>', methods=['GET'])
@@ -92,7 +90,7 @@ def get_job_status(id):
 
     # This should propably be its own Process/Worker
     delta = datetime.now() - job["start"]
-    if delta.total_seconds() > 2:
+    if delta.total_seconds() > 20:
         job["status"] = "DONE"
 
     job = jobs_id[id]
@@ -105,4 +103,4 @@ def get_job_status(id):
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0", debug=True)

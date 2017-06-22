@@ -97,7 +97,7 @@ class User:
         #Poll job status
         while True:
             time.sleep(self.poll_time)
-            self.log.debug('Polling job status')
+            self.log.debug('Polling status for job \t{}'.format(job_uri))
             r = requests.get(job_uri, timeout = self.timeout)
             r.raise_for_status()
             status_msg = r.json()
@@ -123,5 +123,5 @@ if __name__ == '__main__':
 
     os.mkdir(log_path)
 
-    WG = WLGenerator(SERVICE_URL, 2, 1)
+    WG = WLGenerator(SERVICE_URL, 10, 2, poll_time = 5.0, timeout=5.0)
     WG.run_wg()
