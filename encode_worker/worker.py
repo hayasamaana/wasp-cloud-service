@@ -8,10 +8,12 @@ from subprocess import call, STDOUT, DEVNULL
 
 def callback(ch, method, properties, body):
 	print(" [x] Received %r" % body)
+	# Update the statust to PROCESSING
 	cmd = """mencoder %s -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=3000
              -oac copy -o %s""" % (source, dest)
     print("Converting video file")
     call(shlex.split(cmd), stdout=DEVNULL, stderr=STDOUT)
+	# Update the statust to DONE
 
 
 def receive(connection_info=None):

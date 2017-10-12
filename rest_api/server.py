@@ -91,7 +91,9 @@ def get_encoded_movie(movie):
     # When it exist in the databse we place it to the queue
 
     # We post the job to the mongo DB with it's initial status
-    postJob(job)
+    dabaseTask = job
+    dabaseTask['id'] = id
+    postJob(dabaseTask)
 
     #URI to the newly created job
     resp = make_response(("", 201))

@@ -6,8 +6,11 @@ import pika, requests
 #https://curl.trillworks.com/
 
 iptab = {'170.16.0.9':'0','170.16.0.13':'1'} #initial entries same as those checkin in nginx config file
-url = 'http://localhost/upstream_conf'
+# 0 is working state
+# 1 is available state
 
+#Read the iptab from the mongoDB
+url = 'http://localhost/upstream_conf'
 
 
 def callback(ch, method, properties, body):
@@ -33,8 +36,7 @@ def removeip(address):
     payload = {'upstream':'webserver','remove':'','id':idnum}
     r = request.get(url,params=payload)
     del iptab[address] #remove the entry from the iptab
-
-
+    
 
 
 if __name__ == "__main__":

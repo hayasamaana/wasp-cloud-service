@@ -46,6 +46,7 @@ class Manager:
     def assign_floating_IP(self, vm):
         self.nova.floating_ip_pools.list()
         floating_ip = self.nova.floating_ips.create(self.nova.floating_ip_pools.list()[0].name)
+        #TODO: add the IP to the list of available servers
         instance = self.nova.servers.find(name=vm)
         instance.add_floating_ip(floating_ip)
         print("floating IP %s is assigned to %s VM", floating_ip.ip, vm)
