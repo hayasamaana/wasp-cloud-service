@@ -11,6 +11,8 @@ import uuid
 from datetime import datetime
 from copy import copy
 from swiftwrapper.wrapper import SwiftWrapper, ServiceDefaults
+from dbwrp import postJob
+
 
 app = Flask(__name__)
 
@@ -52,6 +54,9 @@ def get_movies():
             f.save(filename)  # File appears in the directory, should be put on SWIFT
             return jsonify({"message": "file uploaded!"})
         return redirect(url_for('get_movies'))
+
+        # Double checking, this below is indented as "else" to the first if? So, the GET response?
+    print("Is this called?")
     movies = swift_cl.list_container(container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER)
     return jsonify([make_public_movie(movie) for movie in movies])
 
@@ -61,6 +66,8 @@ def get_encoded_movie(movie):
 
     movie_exist = False
     movies = swift_cl.list_container(container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER)
+    
+    #identfying if the specified movie exists
     for entry in movies:
         if entry['title'] == movie:
             movie_exist = True
@@ -69,7 +76,10 @@ def get_encoded_movie(movie):
     if not movie_exist:
         not_found()
 
-    # Create job
+    
+    # ELSE, the movie exists
+
+    # Create a job
     id = uuid.uuid4().hex
     job = {"input": url_for("get_encoded_movie", movie = movie),
            "status": "PENDING",
@@ -77,6 +87,11 @@ def get_encoded_movie(movie):
     jobs_id[id] = job
 
     #TODO:Post to queue
+    # POST TO THE database so the ID exists
+    # When it exist in the databse we place it to the queue
+
+    # We post the job to the mongo DB with it's initial status
+    postJob(job)
 
     #URI to the newly created job
     resp = make_response(("", 201))
@@ -95,7 +110,7 @@ def get_job_status(id):
 
     job = jobs_id[id]
 
-    status_dict = copy(job)
+    status_dict = copy(job) # what is this copy job? Why? 
     status_dict["resource"] = "null"
     status_dict["resolution"] = "success" if job["status"] == "DONE" else "null"
 
