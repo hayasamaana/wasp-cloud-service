@@ -105,4 +105,3 @@ ENV/
 # mypy
 .mypy_cache/
 .pem
-
