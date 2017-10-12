@@ -3,5 +3,7 @@
 server=129.192.68.68
 port=5672
 queue=encode
+
+[user1]
 username=test
 password=test

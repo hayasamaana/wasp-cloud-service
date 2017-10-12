@@ -19,7 +19,7 @@ config.read('../rabbitMQcred.txt')
 
 #Connection to the Queue
 rabbitServer=config.get('rabbit', 'server');
-rabbitPort=config.get('rabbit', 'port');
+rabbitPort=int(config.get('rabbit', 'port'));
 rabbitUser=config.get('user1', 'username');
 rabbitPassword=config.get('user1', 'password');
 
