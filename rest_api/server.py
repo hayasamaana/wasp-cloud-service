@@ -23,10 +23,12 @@ rabbitPort=int(config.get('rabbit', 'port'));
 rabbitUser=config.get('user1', 'username');
 rabbitPassword=config.get('user1', 'password');
 
+#Deciding which qeue we will publish too
+rabbitQueue=config.get('rabbit', 'queue');
 credentials = pika.PlainCredentials(rabbitUser, rabbitPassword)
 connection = pika.BlockingConnection(pika.ConnectionParameters(rabbitServer,rabbitPort,'/',credentials))
 channel = connection.channel()
-channel.queue_declare(queue='wasp')
+channel.queue_declare(queue=str(rabbitQueue))
 
 
 app = Flask(__name__)
@@ -110,7 +112,11 @@ def get_encoded_movie(movie):
     dabaseTask['id'] = id
     postJob(dabaseTask)
 
-    #POST it to the MSMQ
+    #also, we publish the job in the RabbitMQ queue
+    channel.basic_publish(exchange='',
+                      routing_key=str(rabbitQueue),
+                      body=str(id))
+
 
 
     #URI to the newly created job

@@ -1,8 +1,8 @@
-#credentials.txt
+
 [rabbit]
 server=129.192.68.68
 port=5672
-queue=encode
+queue=encoder
 
 [user1]
 username=test

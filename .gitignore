@@ -105,3 +105,4 @@ ENV/
 # mypy
 .mypy_cache/
 .pem
+lbserver.pem
