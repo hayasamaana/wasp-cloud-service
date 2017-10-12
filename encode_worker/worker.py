@@ -13,9 +13,10 @@ def callback(ch, method, properties, body):
 
 	cmd = """mencoder %s -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=3000
              -oac copy -o %s""" % (source, dest)
-    print("Converting video file")
-    call(shlex.split(cmd), stdout=DEVNULL, stderr=STDOUT)
+	print("Converting video file")
 	
+	call(shlex.split(cmd), stdout=DEVNULL, stderr=STDOUT)
+
 	# upload converted video to SWIFT 
 	# Update the statust to DONE
 
@@ -48,5 +49,5 @@ if __name__=="__main__":
 		connection["password"] = config.get('rabbit', 'password')
 		receive(connection_info=connection)
 	else:
-		#e.g. python backend.py -c credentials.txt
-		print("Syntax: 'python backend.py -h' | '--help' for help")
+		# e.g. python backend.py -c credentials.txt
+		print("Syntax: 'python worker.py -h' | '--help' for help")

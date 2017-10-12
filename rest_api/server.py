@@ -117,11 +117,10 @@ def get_encoded_movie(movie):
                       routing_key=str(rabbitQueue),
                       body=str(id))
 
-
-
     #URI to the newly created job
     resp = make_response(("", 201))
     resp.headers['location'] = url_for("get_job_status", id = id)
+    connection.close() #closing the connection to the queue
     return resp
 
 
