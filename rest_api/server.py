@@ -102,13 +102,14 @@ def get_encoded_movie(movie):
 @app.route('/api/v1/jobs/<id>', methods=['GET'])
 def get_job_status(id):
     job = jobs_id[id]
+    if '_id' in job:
+        del job['_id']
+    print("Got Job: ", job)
 
     # This should propably be its own Process/Worker
     delta = datetime.now() - job["start"]
     if delta.total_seconds() > 20:
         job["status"] = "DONE"
-
-    job = jobs_id[id]
 
     status_dict = copy(job) # what is this copy job? Why? 
     status_dict["resource"] = "null"
