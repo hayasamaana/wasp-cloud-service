@@ -12,6 +12,10 @@ from datetime import datetime
 from copy import copy
 from swiftwrapper.wrapper import SwiftWrapper, ServiceDefaults
 from dbwrp import postJob
+import pika
+import ConfigParser
+config = ConfigParser.RawConfigParser()
+config.read('../rabbitMQcred.txt')
 
 
 app = Flask(__name__)
@@ -94,6 +98,9 @@ def get_encoded_movie(movie):
     dabaseTask = job
     dabaseTask['id'] = id
     postJob(dabaseTask)
+
+    #POST it to the MSMQ
+
 
     #URI to the newly created job
     resp = make_response(("", 201))

@@ -38,7 +38,6 @@ def removeip(address):
     del iptab[address] #remove the entry from the iptab
     
 
-
 if __name__ == "__main__":
     connection = pika.BlockingConnection(pika.ConnectionParameters(host='localhost'))
     channel = connection.channel()
