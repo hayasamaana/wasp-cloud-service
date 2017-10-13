@@ -1,8 +1,8 @@
 #!/bin/sh
 
 # set hostname 
-sudo echo waspmq > /etc/hostname
-sudo sed -i "s/127.0.0.1 localhost/127.0.0.1 waspmq/g" /etc/hosts
+sudo echo lbserver > /etc/hostname
+sudo sed -i "s/127.0.0.1 localhost/127.0.0.1 lbserver/g" /etc/hosts
 
 # Install some packages
 sudo apt-get -y update
