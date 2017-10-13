@@ -111,7 +111,7 @@ def get_encoded_movie(movie):
     # We post the job to the mongo DB with it's initial status
     dabaseTask = job
     dabaseTask['id'] = id
-    #postJob(dabaseTask)
+    postJob(dabaseTask)
 
     #also, we publish the job in the RabbitMQ queue
     channel.basic_publish(exchange='',
