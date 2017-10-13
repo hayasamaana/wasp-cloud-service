@@ -19,7 +19,7 @@ signal.signal(signal.SIGINT, signal_handler)
 
 class WLGenerator:
 
-    def __init__(self, host, n_users, think_time, poll_time = 1., timeout = 2.):
+    def __init__(self, host, n_users, think_time, poll_time = 1., timeout = 5.):
         self.host = host
         self.n_users = n_users
         self.think_time = think_time
@@ -87,6 +87,7 @@ class User:
         r.raise_for_status()
 
         movie_uri = self.random_choice_movie(r.json())
+        print(movie_uri )
 
         r = requests.get(movie_uri, timeout = self.timeout)
         self.log.info("Requested {} for conversion, response {}".format(movie_uri, r.status_code))
