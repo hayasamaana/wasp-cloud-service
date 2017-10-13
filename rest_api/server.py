@@ -113,9 +113,9 @@ def get_encoded_movie(movie):
     postJob(dabaseTask)
 
     #also, we publish the job in the RabbitMQ queue
-    #channel.basic_publish(exchange='',
-    #                 routing_key=str(rabbitQueue),
-    #                 body=str(id))
+    channel.basic_publish(exchange='',
+                      routing_key=str(rabbitQueue),
+                      body=str(id))
 
     #URI to the newly created job
     resp = make_response(("", 201))
