@@ -97,3 +97,4 @@ class SwiftWrapper:
 if __name__ == '__main__':
     sw = SwiftWrapper()
     print(sw.list_container())
+    print(sw.download_item("jellyfish-10-mbps-hd-h264.mkv"))
