@@ -24,3 +24,7 @@ def getDocumentById(id):
 def updateDocumentStatus(id, status):
     cl.update_one({"id":id},{"$set": {
         "status":status}})
+
+def updateDocument(id, attrName, attrValue):
+    cl.update_one({"id":id},{"$set": {
+        attrName:attrValue}})

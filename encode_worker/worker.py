@@ -42,12 +42,16 @@ def callback(ch, method, properties, movieId):
 
 		call(shlex.split(cmd), stdout=FNULL, stderr=STDOUT)
 
-		# upload converted video to SWIFT
+		# upload converted video to SWIFT container
+		print("Uploading Converted Video")
 		movies = container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER
 		sw.upload_item(movies,dest)
+
 		# Update the statust to DONE
-		
 		dbwrp.updateDocumentStatus(movieId, "DONE")
+
+		# Add the path to the converted file
+		dbwrp.updateDocument(movieId,"convertedTitle",dest)
 	else:
 		print("No document found, skipping ", movieId)
 

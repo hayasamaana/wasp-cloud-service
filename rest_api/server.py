@@ -72,9 +72,6 @@ def get_movies():
             f.save(filename)  # File appears in the directory, should be put on SWIFT
             return jsonify({"message": "file uploaded!"})
         return redirect(url_for('get_movies'))
-
-        # Double checking, this below is indented as "else" to the first if? So, the GET response?
-    print("Is this called?")
     movies = swift_cl.list_container(container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER)
     return jsonify([make_public_movie(movie) for movie in movies])
 
