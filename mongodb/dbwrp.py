@@ -1,6 +1,7 @@
 ''' The Wrapper for accessing the mongo DB '''
 import pymongo
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 mngserv = {
     "ip":"129.192.68.68",
@@ -16,3 +17,10 @@ cl = db.jobs
 
 def postJob(jobData):
     cl.insert(jobData)
+
+def getDocumentById(id):
+    return cl.find_one({"id":id})
+
+def updateDocumentStatus(id, status):
+    cl.update_one({"id":id},{"$set": {
+        "status":status}})

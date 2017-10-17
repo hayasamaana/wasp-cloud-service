@@ -4,26 +4,41 @@ from optparse import OptionParser
 import ConfigParser
 import shlex
 from subprocess import call, STDOUT
+import sys
 import os
+
+# Importing mongodb wrapper
+sys.path.append('../mongodb')
+import dbwrp
+
 
 
 def callback(ch, method, properties, movieId):
-	print(" [x] Received %r" % movieId)
-	
+	print(" [x] Received %r for encoding" % movieId)
 	# Query the Mongo Database for information about the new movie
-	# Update the statust to PROCESSING of the correct movie
-	# Download the movie from the SWIFT object storage and save it as source 
+	doc = dbwrp.getDocumentById(movieId)
 
-	cmd = """mencoder %s -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=3000
-             -oac copy -o %s""" % (source, dest)
-	print("Converting video file")
+	if doc:
+    		print("Got document: ", doc)
+			# Update the statust to CONVERTING of the correct movie
+    		dbwrp.updateDocumentStatus(movieId, "CONVERTING")
+
+			# Download the Video from the Storage. The vide file name is saved in the title parameter of the document with the given id
+			# cmd = """mencoder %s -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=3000
+			#         -oac copy -o %s""" % (source, dest)
+			# print("Converting video file")
+			
+			# call(shlex.split(cmd), stdout=os.devnull, stderr=STDOUT)
+
+			
+
+			# upload converted video to SWIFT 
+			# Update the statust to DONE
+
+
+	else:
+    		print("No document found, skipping ", movieId)
 	
-	call(shlex.split(cmd), stdout=os.devnull, stderr=STDOUT)
-
-	
-
-	# upload converted video to SWIFT 
-	# Update the statust to DONE
 
 
 def receive(connection_info=None):

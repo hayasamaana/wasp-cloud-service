@@ -3,6 +3,7 @@
 #https://stackoverflow.com/questions/9383014/cant-import-my-own-modules-in-python
 import sys
 sys.path.append("../")
+sys.path.append('../mongodb')
 
 from flask import Flask, jsonify, abort
 from flask import make_response, request, url_for, render_template
@@ -11,7 +12,7 @@ import uuid
 from datetime import datetime
 from copy import copy
 from swiftwrapper.wrapper import SwiftWrapper, ServiceDefaults
-from dbwrp import postJob
+import dbwrp
 import pika
 import ConfigParser
 config = ConfigParser.RawConfigParser()
@@ -101,13 +102,14 @@ def get_encoded_movie(movie):
     id = uuid.uuid4().hex
     job = {"input": url_for("get_encoded_movie", movie = movie),
            "status": "PENDING",
+           "title": movie,
            "start": datetime.now()}
     jobs_id[id] = job
 
     # We post the job to the mongo DB with it's initial status
     dabaseTask = job
     dabaseTask['id'] = id
-    postJob(dabaseTask)
+    dbwrp.postJob(dabaseTask)
 
     #also, we publish the job in the RabbitMQ queue
     channel.basic_publish(exchange='',
