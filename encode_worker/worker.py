@@ -3,7 +3,7 @@ import pika
 from optparse import OptionParser
 import ConfigParser
 import shlex
-from subprocess import call, STDOUT, 
+from subprocess import call, STDOUT
 import sys
 import os
 
@@ -38,12 +38,13 @@ def callback(ch, method, properties, movieId):
 			source, dest)
 		print("Converting video file")
 
-		call(shlex.split(cmd), stdout=DEVNULL, stderr=subprocess.STDOUT)
+		FNULL = open(os.devnull, 'w')
+
+		call(shlex.split(cmd), stdout=FNULL, stderr=STDOUT)
 
 		# upload converted video to SWIFT
 		movies = swift_cl.list_container(container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER)
 		sw.upload_item(movies,dest)
-
 		# Update the statust to DONE
 		
 		dbwrp.updateDocumentStatus(movieId, "DONE")
