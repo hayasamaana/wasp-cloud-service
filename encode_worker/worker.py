@@ -3,7 +3,7 @@ import pika
 from optparse import OptionParser
 import ConfigParser
 import shlex
-from subprocess import call, STDOUT, DEVNULL
+from subprocess import call, STDOUT, 
 import sys
 import os
 
