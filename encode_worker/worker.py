@@ -38,7 +38,7 @@ def callback(ch, method, properties, movieId):
 			source, dest)
 		print("Converting video file")
 
-		call(shlex.split(cmd), stdout=DEVNULL, stderr=STDOUT)
+		call(shlex.split(cmd), stdout=DEVNULL, stderr=subprocess.STDOUT)
 
 		# upload converted video to SWIFT
 		movies = swift_cl.list_container(container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER)
