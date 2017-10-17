@@ -7,8 +7,8 @@ from subprocess import call, STDOUT
 import os
 
 
-def callback(ch, method, properties, body):
-	print(" [x] Received %r" % body)
+def callback(ch, method, properties, movieId):
+	print(" [x] Received %r" % movieId)
 	
 	# Query the Mongo Database for information about the new movie
 	# Update the statust to PROCESSING of the correct movie

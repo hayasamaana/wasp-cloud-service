@@ -104,10 +104,6 @@ def get_encoded_movie(movie):
            "start": datetime.now()}
     jobs_id[id] = job
 
-    #TODO:Post to queue
-    # POST TO THE database so the ID exists
-    # When it exist in the databse we place it to the queue
-
     # We post the job to the mongo DB with it's initial status
     dabaseTask = job
     dabaseTask['id'] = id
@@ -117,6 +113,8 @@ def get_encoded_movie(movie):
     channel.basic_publish(exchange='',
                       routing_key=str(rabbitQueue),
                       body=str(id))
+
+    print("Published: ", str(id))
 
     #URI to the newly created job
     resp = make_response(("", 201))
