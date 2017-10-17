@@ -43,7 +43,7 @@ def callback(ch, method, properties, movieId):
 		call(shlex.split(cmd), stdout=FNULL, stderr=STDOUT)
 
 		# upload converted video to SWIFT
-		movies = sw.list_container(container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER)
+		movies = container=ServiceDefaults.DEFAULT_VIDEO_CONTAINER
 		sw.upload_item(movies,dest)
 		# Update the statust to DONE
 		
