@@ -27,7 +27,7 @@ def callback(ch, method, properties, body):
 
 
 def receive(connection_info=None):
-	qname = "encode"
+	qname = credentials = pika.PlainCredentials(connection_info["queue"])
 	credentials = pika.PlainCredentials(connection_info["username"], connection_info["password"])
 	connection = pika.BlockingConnection(pika.ConnectionParameters(connection_info["server"],connection_info["port"],'/',credentials))
 	channel = connection.channel()
