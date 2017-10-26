@@ -7,8 +7,10 @@ import logging
 import shutil
 
 
-SERVICE_URL = 'http://localhost:5000'
 
+#SERVICE_URL = 'http://localhost:5000'
+#change the port to the loadbalancer
+SERVICE_URL = 'http://localhost:80'
 
 def signal_handler(signal, frame):
         print('Process {} You pressed Ctrl+C! Quitting simulation.'.format(os.getpid()))
